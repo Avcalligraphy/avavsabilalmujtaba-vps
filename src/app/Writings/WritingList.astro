@@ -1,0 +1,60 @@
+---
+import { getCollection } from "astro:content";
+import dayjs from "dayjs";
+import WritingListItem from "./WritingListItem.astro";
+
+// dayjs locale id
+import "dayjs/locale/id";
+dayjs.locale("id");
+
+// dayjs timezone
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Jakarta");
+
+let blogs = await getCollection("blog");
+async function fetchBlogData () {
+  try {
+    const res = await fetch("https://admin.avavsabilalmujtaba.my.id/api/blogs?populate=*")
+    const response = await res.json()
+    return response
+  } catch (error) {
+    console.error(error)
+    return null // atau throw error untuk menangkapnya di tempat lain
+  }
+}
+const fetchedData = await fetchBlogData();
+
+
+fetchedData.data.forEach((blogPost) => {
+  blogPost.attributes.publishedAt = dayjs(blogPost.attributes.publishedAt).format("YYYY-MM-DDTHH:mm:ss.000Z");
+});
+
+
+blogs = fetchedData.data.sort((a, b) => {
+  return dayjs(b.attributes.publishedAt).unix() - dayjs(a.attributes.publishedAte).unix();
+});
+
+
+const posts = fetchedData.data.map((blogPost) => {
+  return {
+    id: blogPost.id,
+    title: blogPost.attributes.Title,
+    publishedAt: blogPost.attributes.publishedAt,
+    category: blogPost.attributes.category_blogs.data,
+  };
+});
+
+const articles = posts.slice(0, 4);
+---
+
+<ul
+  id="writing-list"
+  class="mx-auto grid max-w-[1244px] grid-cols-1 place-content-center gap-x-5 gap-y-3 pt-24 sm:grid-cols-2 sm:gap-y-6 lg:grid-cols-[repeat(2,480px)] xl:grid-cols-[repeat(2,545px)]"
+>
+  {
+    articles?.map((article: { id: string; title: string; category?: any }) => (
+      <WritingListItem id={article.id} title={article.title} category={article.category} />
+    ))
+  }
+</ul>

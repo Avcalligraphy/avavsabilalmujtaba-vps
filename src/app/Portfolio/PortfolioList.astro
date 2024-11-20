@@ -1,0 +1,68 @@
+---
+import { getCollection } from "astro:content";
+import dayjs from "dayjs";
+
+// dayjs locale id
+import "dayjs/locale/id";
+dayjs.locale("id");
+
+// dayjs timezone
+import timezone from "dayjs/plugin/timezone";
+import PortfolioItem from "./PortfolioItem.astro";
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Jakarta");
+
+let blogs = await getCollection("blog");
+async function fetchBlogData () {
+  const option = {
+    headers: {
+      Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`
+    }
+  }
+  try {
+    const res = await fetch("https://admin.avavsabilalmujtaba.my.id/api/portfolios?populate=*")
+    const response = await res.json()
+    return response
+  } catch (error) {
+    console.error(error)
+    return null // atau throw error untuk menangkapnya di tempat lain
+  }
+}
+const fetchedData = await fetchBlogData();
+
+
+fetchedData.data.forEach((blogPost) => {
+  blogPost.attributes.publishedAt = dayjs(blogPost.attributes.publishedAt).format("YYYY-MM-DDTHH:mm:ss.000Z");
+});
+
+
+blogs = fetchedData.data.sort((a, b) => {
+  return dayjs(b.attributes.publishedAt).unix() - dayjs(a.attributes.publishedAte).unix();
+});
+
+
+const posts = fetchedData.data.map((blogPost) => {
+  return {
+    id: blogPost.id,
+    title: blogPost.attributes.Title,
+    publishedAt: blogPost.attributes.publishedAt,
+    // tags: blogPost.data.tags,
+    slug: blogPost.attributes.slug_icons.data,
+    image: blogPost.attributes.image.data.attributes.formats.small.url,
+  };
+});
+
+// const articles = posts.slice(0, 4);
+---
+
+<ul
+  id="portfolio-list"
+  class="mx-auto grid max-w-[1244px] grid-cols-1 place-content-center gap-x-5 gap-y-3 pt-24 sm:grid-cols-2 sm:gap-y-6 lg:grid-cols-[repeat(2,480px)] xl:grid-cols-[repeat(2,545px)]"
+>
+  <!-- <PortfolioItem title="Parking Ezz: Inovasi Parkir Cerdas berbasis multi lane free flow" slug="Website" image="/images/portfolio/1@parking.png" /> -->
+    {
+    posts?.map((article: { id: string; title: string; slug?: any; image?: string; }) => (
+      <PortfolioItem slug={article.slug} title={article.title} image={article.image} id={article.id} />
+    ))
+  }
+</ul>

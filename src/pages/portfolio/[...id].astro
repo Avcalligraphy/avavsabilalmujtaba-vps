@@ -1,0 +1,27 @@
+---
+import PortfolioLayout from "../../layouts/LayoutPortfolio.astro";
+
+const { id } = Astro.params;
+
+
+// export async function getServerSideProps() {
+//   const res = await fetch("https://admin.avavsabilalmujtaba.my.id/api/portfolios?populate=*")
+//   const response = await res.json()
+//   const blogs = response
+//   const paths = blogs.data.map((entry) => ({
+//     params: { id: entry.id },
+//   }));
+
+//   return paths;
+// }
+
+// export const prerender = true;
+
+// const blog = await getEntry("blog", slug);
+
+// if (blog === undefined) {
+//   return Astro.redirect(`/portfolio?404=${Astro.url}`);
+// }
+---
+
+<PortfolioLayout blog={id} />

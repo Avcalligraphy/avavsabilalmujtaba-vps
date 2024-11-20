@@ -1,0 +1,86 @@
+---
+import dayjs from "dayjs";
+
+import IconDate from "../../icons/IconDate.astro";
+
+// dayjs locale id
+import { getCollection } from "astro:content";
+import "dayjs/locale/id";
+dayjs.locale("id");
+
+const blogPosts = await getCollection("blog");
+
+// order by publishDate
+blogPosts.forEach((blogPost) => {
+  blogPost.data.publishDate = dayjs(blogPost.data.publishDate).format("YYYY-MM-DDTHH:mm:ss.000Z");
+});
+
+blogPosts.sort((a, b) => {
+  return dayjs(b.data.publishDate).unix() - dayjs(a.data.publishDate).unix();
+});
+
+async function fetchBlogData () {
+  const option = {
+    headers: {
+      Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`
+    }
+  }
+  try {
+    const res = await fetch("https://admin.avavsabilalmujtaba.my.id/api/blogs?populate=*")
+    const response = await res.json()
+    return response
+  } catch (error) {
+    console.error(error)
+    return null // atau throw error untuk menangkapnya di tempat lain
+  }
+}
+const fetchedData = await fetchBlogData();
+
+
+
+fetchedData.data.forEach((blogPost) => {
+  blogPost.attributes.publishedAt = dayjs(blogPost.attributes.publishedAt).format("YYYY-MM-DDTHH:mm:ss.000Z");
+});
+
+
+// blogs = fetchedData.data.sort((a, b) => {
+//   return dayjs(b.attributes.publishedAt).unix() - dayjs(a.attributes.publishedAte).unix();
+// });
+
+---
+
+<main
+  class="relative mx-auto min-h-screen max-w-[2560px] overflow-hidden px-6 py-16 sm:px-16 sm:pb-32 sm:pt-20"
+  style="background: radial-gradient(82.23% 82.23% at 48.91% 0%, #030303 0%, rgba(10, 10, 10, 0) 100%);"
+>
+  <div class="content-overlay absolute inset-x-0 top-0 z-0 h-[704px] w-screen"></div>
+
+  <ul class="relative mx-auto grid max-w-[1024px] gap-x-20 gap-y-10 sm:grid-cols-2 sm:gap-y-16">
+    {
+      fetchedData.data.map((post) => (
+        <li class="max-w-[410px] text-blog-95">
+          <article>
+            {post.attributes.category_blogs.data.map((category) => (
+              <p class="mb-2 text-xs text-blog-60">{category.attributes.Title}</p>
+            ))}
+            <a href={`/blog/${post.id}`}>
+              <h2 class="balance-text text-base font-bold leading-120 decoration-blog-95/50 underline-offset-4 hover:underline sm:text-xl">
+                {post.attributes.Title}
+              </h2>
+            </a>
+            <div class="mt-4 flex items-center space-x-2 text-xs text-blog-80">
+              <IconDate />
+              <p>{dayjs(post.attributes.publishedAt).format("dddd, DD MMM YYYY")}</p>
+            </div>
+          </article>
+        </li>
+      ))
+    }
+  </ul>
+</main>
+
+<style>
+  .content-overlay {
+    background: radial-gradient(163.28% 86.18% at 50% 0%, rgba(62, 87, 142, 0.1) 0%, rgba(8, 11, 18, 0) 100%);
+  }
+</style>

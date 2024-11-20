@@ -1,0 +1,27 @@
+---
+import BlogLayoutDetail from "../../layouts/LayoutBlogDetail.astro";
+
+const { slug } = Astro.params;
+
+
+// export async function getStaticPaths() {
+//   const res = await fetch("https://admin.avavsabilalmujtaba.my.id/api/blogs?populate=*")
+//   const response = await res.json()
+//   const blogs = response
+//   const paths = blogs.data.map((entry) => ({
+//     params: { slug: entry.id },
+//   }));
+
+//   return paths;
+// }
+
+// export const prerender = true;
+
+// const blog = await getEntry("blog", slug);
+
+// if (blog === undefined) {
+//   return Astro.redirect(`/portfolio?404=${Astro.url}`);
+// }
+---
+
+<BlogLayoutDetail blog={slug} />
