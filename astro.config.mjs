@@ -32,7 +32,7 @@ export default defineConfig({
   redirects: {
     "/Belajar": "/belajar",
   },
-  output: "server",
+  output: "static",
   adapter: vercel({
     analytics: true,
   }),
