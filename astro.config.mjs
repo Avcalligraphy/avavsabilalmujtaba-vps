@@ -10,9 +10,10 @@ import sitemap from "@astrojs/sitemap";
 // https://astro.build/config
 export default defineConfig({
   site: "https://avavsabilalmujtaba.my.id",
-  experimental: {
-    redirects: true,
-  },
+  outDir: "dist",
+  // experimental: {
+  //   redirects: true,
+  // },
   integrations: [
     tailwind(),
     mdx({
