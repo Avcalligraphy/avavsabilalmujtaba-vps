@@ -11,9 +11,9 @@ import sitemap from "@astrojs/sitemap";
 export default defineConfig({
   site: "https://avavsabilalmujtaba.my.id",
   outDir: "dist",
-  experimental: {
-    redirects: true,
-  },
+  // experimental: {
+  //   redirects: true,
+  // },
   integrations: [
     tailwind(),
     mdx({
