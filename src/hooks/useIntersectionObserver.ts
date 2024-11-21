@@ -1,36 +1,47 @@
-import { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 export const useIntersectionObserver = (
   id: string,
   { root = null, rootMargin = "0px", threshold = 0 }: IntersectionObserverInit = {}
 ) => {
-  const [isIntersecting, setIntersecting] = useState(false);
+  const [isIntersecting, setIntersecting] = React.useState(false);
 
   useEffect(() => {
-    // Check if we're in a browser environment
-    if (typeof window === "undefined") return;
-
     const element = document.getElementById(id);
-
-    // Only create observer if element exists
     if (!element) {
-      console.warn(`Element with id "${id}" not found. Skipping intersection observer.`);
+      console.error(`Element with id "${id}" not found.`);
       return;
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
+        // console.log("entries -->", entries);
+
         entries.forEach((entry) => {
-          setIntersecting(entry.isIntersecting);
+          // top intersection
+          console.log("id -->", id);
+          const topIntersecting = entry.boundingClientRect.top <= 0;
+
+          console.log("entry.intersectionRect.top -->", entry.intersectionRect.top);
+          console.log("topIntersecting -->", topIntersecting);
+
+          if (entry.isIntersecting) {
+            setIntersecting(true);
+          } else {
+            setIntersecting(false);
+          }
         });
       },
-      { root, rootMargin, threshold }
+      {
+        root,
+        rootMargin,
+        threshold,
+      }
     );
 
     observer.observe(element);
-
     return () => observer.disconnect();
-  }, [id, root, rootMargin, threshold]);
+  }, [id]);
 
   return [isIntersecting];
 };
